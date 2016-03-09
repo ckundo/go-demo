@@ -1,22 +1,22 @@
 package main
 
-import(
-	"github.com/julienschmidt/httprouter"
+import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestRequests(t *testing.T) {
-	ts := httprouter.New()
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("GET", "/", nil)
+	router := newRouter()
+	server := httptest.NewServer(router)
+	defer server.Close()
 
-	addRoutes(ts)
+	response, err := http.Get(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	ts.ServeHTTP(w, r)
-
-	if(w.Code != http.StatusOK) {
-		t.Errorf("Expected 200 response, got %d", w.Code)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("Expected 200 response, got %d", response.StatusCode)
 	}
 }
